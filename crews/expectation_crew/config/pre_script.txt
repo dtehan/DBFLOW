@@ -1,0 +1,38 @@
+###########################################################################################
+# Great Expectations environment creation script
+#
+# Required packagages: python 3.11, teradataml, crewai, crewai-tools, great_expectations
+#
+#
+###########################################################################################
+
+###############################################
+# Begining of configuration of Data Context
+
+import great_expectations as gx
+
+#create the context
+data_context = gx.get_context(mode="file")
+
+#add the data source to the context
+data_source_name = "dsname"
+database_name = "schema_name"
+connection_string = "conn_str"
+data_source = data_context.data_sources.add_or_update_sql(data_source_name, connection_string=connection_string)
+
+
+###############################################
+# Checkpoints - actions
+
+action_list = [
+    # This Action updates the Data Docs static website with the Validation
+    #   Results after the Checkpoint is run.
+    gx.checkpoint.UpdateDataDocsAction(
+        name="update_all_data_docs",
+    ),
+]
+
+result_format={"result_format": "COMPLETE"}
+
+###############################################
+# Building data assets, expectations, validations

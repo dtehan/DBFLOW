@@ -1,0 +1,184 @@
+write_expectation:
+  description: >
+    You are a data quality expert using great expectations CX Core version 1.2.0 package, 
+    your role is to identify the expectations that should be applied to a table based on the table definition and add the dynamic code blocks,
+    ensure that you add the static code blocks without any modifications before the expectations and after the expectations.
+    There may be multiple tables to be processed.
+    Only use the following expectations:
+        gx.expectations.ExpectColumnPairValuesToBeEqual
+        gx.expectations.ExpectMulticolumnSumToEqual
+        gx.expectations.ExpectColumnValuesToBeNull
+        gx.expectations.ExpectColumnValuesToNotBeNull
+        gx.expectations.ExpectColumnValueLengthsToBeBetween
+        gx.expectations.ExpectColumnValueLengthsToEqual
+        gx.expectations.ExpectColumnValuesToMatchLikePattern
+        gx.expectations.ExpectColumnValuesToMatchLikePatternList
+        gx.expectations.ExpectColumnValuesToMatchRegex
+        gx.expectations.ExpectColumnValuesToMatchRegexList
+        gx.expectations.ExpectColumnValuesToNotMatchLikePattern
+        gx.expectations.ExpectColumnValuesToNotMatchLikePatternList
+        gx.expectations.ExpectColumnValuesToNotMatchRegex
+        gx.expectations.ExpectColumnValuesToNotMatchRegexList
+        gx.expectations.ExpectColumnProportionOfUniqueValuesToBeBetween
+        gx.expectations.ExpectColumnUniqueValueCountToBeBetween
+        gx.expectations.ExpectColumnValuesToBeUnique
+        gx.expectations.ExpectCompoundColumnsToBeUnique
+        gx.expectations.ExpectSelectColumnValuesToBeUniqueWithinRecord
+        gx.expectations.ExpectColumnDistinctValuesToBeInSet
+        gx.expectations.ExpectColumnDistinctValuesToContainSet
+        gx.expectations.ExpectColumnDistinctValuesToEqualSet
+        gx.expectations.ExpectColumnMostCommonValueToBeInSet
+        gx.expectations.ExpectColumnPairValuesToBeInSet
+        gx.expectations.ExpectColumnValuesToBeInSet
+        gx.expectations.ExpectColumnValuesToNotBeInSet
+        gx.expectations.ExpectColumnKLDivergenceToBeLessThan
+        gx.expectations.ExpectColumnPairValuesAToBeGreaterThanB
+        gx.expectations.ExpectColumnStdevToBeBetween
+        gx.expectations.ExpectColumnSumToBeBetween
+        gx.expectations.ExpectColumnValueZScoresToBeLessThan
+        gx.expectations.ExpectColumnValuesToBeBetween
+        gx.expectations.ExpectColumnMaxToBeBetween
+        gx.expectations.ExpectColumnMeanToBeBetween
+        gx.expectations.ExpectColumnMedianToBeBetween
+        gx.expectations.ExpectColumnMinToBeBetween
+        gx.expectations.ExpectColumnQuantileValuesToBeBetween
+        gx.expectations.ExpectColumnToExist
+        gx.expectations.ExpectColumnValuesToBeInTypeList
+        gx.expectations.ExpectColumnValuesToBeOfType
+        gx.expectations.ExpectTableColumnCountToBeBetween
+        gx.expectations.ExpectTableColumnCountToEqual
+        gx.expectations.ExpectTableColumnsToMatchOrderedList
+        gx.expectations.ExpectTableColumnsToMatchSet
+        gx.expectations.ExpectTableRowCountToBeBetween
+        gx.expectations.ExpectTableRowCountToEqual
+        gx.expectations.ExpectTableRowCountToEqualOtherTable
+
+    Example 1 input:
+        CREATE SET TABLE EMPLOYEE,FALLBACK ( 
+          EmployeeNo INTEGER, 
+          FirstName VARCHAR(30), 
+          LastName VARCHAR(30), 
+          DOB DATE FORMAT 'YYYY-MM-DD', 
+          JoinedDate DATE FORMAT 'YYYY-MM-DD', 
+          DepartmentNo BYTEINT 
+        ) 
+        UNIQUE PRIMARY INDEX ( EmployeeNo );
+
+        /*
+        3 rows from EMPLOYEE table:
+        EmployeeNo  FirstName LastName  DOB JoinedDate  Department No
+        37264920  Ben Charmaine 1970-08-23  2021-02-02  307
+        66698405  Ahmed Jinder  1999-02-14  2023-08-26  104
+        42947424  Smith Bill  1984-11-17  2001-12-02  827
+        */
+
+    Example 1 output: 
+        # dynamic code block
+        table_name = "EMPLOYEE"
+
+        # static code block
+        table_asset = data_context.data_sources.get(data_source_name).add_table_asset( table_name = table_name, name=table_name, schema_name=database_name)
+        batch = data_context.data_sources.get(data_source_name).get_asset(table_name).add_batch_definition_whole_table(name=table_name)
+        data_context.suites.add(gx.ExpectationSuite(name=table_name))
+
+        # dynamic code block
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValuesToBeUnique(column="EmployeeNo"))
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValueLengthsToBeBetween(column="FirstName", max_value=30))
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValueLengthsToBeBetween(column="LastName", max_value=30))
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValuesToBeOfType(column="DepartmentNo", type_="BYTEINT"))
+        
+        # static code block
+        data_context.suites.get(table_name).save()
+        data_context.validation_definitions.add(gx.ValidationDefinition(name=table_name, data=batch, suite=data_context.suites.get(table_name) ))
+        data_context.checkpoints.add(gx.Checkpoint(name=table_name, validation_definitions=[data_context.validation_definitions.get(table_name)], actions=action_list, result_format=result_format))
+        checkpoint = data_context.checkpoints.get(table_name)
+        checkpoint.run()
+        checkpoint.save()
+
+    Example 2 input:
+        CREATE TABLE accounts (
+            cust_id     INTEGER, 
+            last_name   VARCHAR(30) CHARACTER SET UNICODE NOT CASESPECIFIC, 
+            first_name  VARCHAR(30), 
+            city        VARCHAR(50))
+        PRIMARY INDEX (cust_id)
+
+        /*
+        3 rows from accounts table:
+        cust_id last_name first_name  city
+        28275 Tehan Daniel  Bellevue
+        0980498 Jones Fred  Melbourne
+        72663819700 Sparrow Mary  Paris
+        */
+
+    Output 2 output:    
+        # dynamic code block
+        table_name = "accounts"
+        
+        # static code block
+        table_asset = data_context.data_sources.get(data_source_name).add_table_asset( table_name = table_name, name=table_name, schema_name=database_name)
+        batch = data_context.data_sources.get(data_source_name).get_asset(table_name).add_batch_definition_whole_table(name=table_name)
+        data_context.suites.add(gx.ExpectationSuite(name=table_name))
+
+        # dynamic code block
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValuesToNotBeNull(column="cust_id"))
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValuesToNotBeNull(column="cust_id"))
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValueLengthsToBeBetween(column="last_name", max_value=30))
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValueLengthsToBeBetween(column="first_name", max_value=30))
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValueLengthsToBeBetween(column="city", max_value=50))
+        
+        # static code block
+        data_context.suites.get(table_name).save()
+        data_context.validation_definitions.add(gx.ValidationDefinition(name=table_name, data=batch, suite=data_context.suites.get(table_name) ))
+        data_context.checkpoints.add(gx.Checkpoint(name=table_name, validation_definitions=[data_context.validation_definitions.get(table_name)], actions=action_list, result_format=result_format))
+        checkpoint = data_context.checkpoints.get(table_name)
+        checkpoint.run()
+        checkpoint.save()
+
+    Example 3 input:
+        CREATE TABLE job (
+            job_id     INTEGER, 
+            job_description   VARCHAR(1024) CHARACTER SET UNICODE NOT CASESPECIFIC, 
+            EmployeeNo INTEGER,
+            cust_id   INTEGER)
+        PRIMARY INDEX (cust_id)
+
+        /*
+        3 rows from job table:
+        job_id  job_description EmployeeNo cust_id 
+        1 Job descrition  37264920  28275 
+        2 Job descrition  66698405  0980498 
+        3 Job descriotion 42947424  72663819700 
+        */
+
+    Output 3 output:    
+        # dynamic code block
+        table_name = "job"
+        
+        # static code block
+        table_asset = data_context.data_sources.get(data_source_name).add_table_asset( table_name = table_name, name=table_name, schema_name=database_name)
+        batch = data_context.data_sources.get(data_source_name).get_asset(table_name).add_batch_definition_whole_table(name=table_name)
+        data_context.suites.add(gx.ExpectationSuite(name=table_name))
+
+        # dynamic code block
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValuesToBeUnique(column="job_id"))
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValuesToNotBeNull(column="job_id"))
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValueLengthsToBeBetween(column="job_description", max_value=1024))
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValuesToBeUnique(column="EmployeeNo"))
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValuesToNotBeNull(column="EmployeeNo"))
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValuesToBeUnique(column="cust_id"))
+        data_context.suites.get(table_name).add_expectation(gx.expectations.ExpectColumnValuesToNotBeNull(column="cust_id"))
+
+        # static code block
+        data_context.suites.get(table_name).save()
+        data_context.validation_definitions.add(gx.ValidationDefinition(name=table_name, data=batch, suite=data_context.suites.get(table_name) ))
+        data_context.checkpoints.add(gx.Checkpoint(name=table_name, validation_definitions=[data_context.validation_definitions.get(table_name)], actions=action_list, result_format=result_format))
+        checkpoint = data_context.checkpoints.get(table_name)
+        checkpoint.run()
+        checkpoint.save()
+
+    write the python code for the expectation statements, assume all the supporting code is already in place, only for the following tables:  {table_definition} 
+
+  expected_output: >
+    python code for the expectations only
+  agent: expectation_writer

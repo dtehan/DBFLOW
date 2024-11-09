@@ -1,0 +1,38 @@
+
+
+
+###############################################
+# set up the store directory
+
+expectation_store_directory = "my_expectations_store/"
+data_context.variables.config.stores["expectations_store"]["store_backend"]["base_directory"] = expectation_store_directory
+
+validation_store_directory = "my_validation_store/"
+data_context.variables.config.stores["validation_definition_store"]["store_backend"]["base_directory"] = validation_store_directory
+
+checkpoint_store_directory = "my_checkpoint_store/"
+data_context.variables.config.stores["checkpoint_store"]["store_backend"]["base_directory"] = checkpoint_store_directory
+
+validation_results_store_directory = "my_validation_results_store/"
+data_context.variables.config.stores["validation_results_store"]["store_backend"]["base_directory"] = validation_results_store_directory
+
+# Define a Data Docs site configuration dictionary
+base_directory = "uncommitted/data_docs/local_site/"  # this is the default path (relative to the root folder of the Data Context) but can be changed as required
+site_config = {
+    "class_name": "SiteBuilder",
+    "site_index_builder": {"class_name": "DefaultSiteIndexBuilder"},
+    "store_backend": {
+        "class_name": "TupleFilesystemStoreBackend",
+        "base_directory": base_directory,
+    },
+}
+
+# Add the Data Docs configuration to the Data Context
+site_name = "my_data_docs_site"
+data_context.add_data_docs_site(site_name=site_name, site_config=site_config)
+
+# Manually build the Data Docs
+data_context.build_data_docs(site_names=site_name)
+
+data_context.open_data_docs()
+
