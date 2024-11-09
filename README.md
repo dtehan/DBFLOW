@@ -19,11 +19,13 @@ The entire flow of the process is controlled using crewai flow.
 ## Configuration
 
 **Open AI Version**
-This version requires an Open AI key to be in the geflow.env file. GPT 4o mini is fast, comprehensive and reasonable price.
+- This version requires an Open AI key to be in the geflow.env file. GPT 4o mini is fast, comprehensive and reasonable price.
+
 **Bedrock Sonet version**
-This requires a set of AWS keys to be defined in the geflow.env file.  Sonet 3.5 does a comprehensive job, but is slow and more expensive.
+- This requires a set of AWS keys to be defined in the geflow.env file.  Sonet 3.5 does a comprehensive job, but is slow and more expensive.
+
 **Bedrock Llama version**
-This requires a set of AWS keys to be defined in the geflow.env file. Llama 3.2 3B model is fast and cheap, not a lot of details in the descriptions. 
+- This requires a set of AWS keys to be defined in the geflow.env file. Llama 3.2 3B model is fast and cheap, not a lot of details in the descriptions. 
 
 geflow.env file configuration shown below
 
@@ -74,7 +76,8 @@ logmech =
 
 ## Directory structure
 
-***Core Directories ***
+**Core Directories**
+
 [./](./)
 - root directory for the application 
 - contains main_bedrock.py & main_openai.py files
@@ -89,7 +92,8 @@ logmech =
 - dbconfig.py writes database config and reads database config file
 - helper.py contains functions to read the geflow.env file
 
-***Great Expectation Directories ***
+**Great Expectation Directories**
+
 [./crews/expectation_crew/](./crews/expectation_crew/)
 - bedrock_expectation_crew.py 
 - openai_expectation_crew.py
@@ -103,7 +107,8 @@ logmech =
 [./crews/expectation_crew/Output](./crews/expectation_crew/Output)
 - contains the generated great expectation scripts for the schemas, example output is provided
 
-***Database Writer Directories ***
+**Database Writer Directories**
+
 [./crews/writer_crew/](./crews/writer_crew/)
 - bedrock_writer_crew.py 
 - openai_writer_crew.py
@@ -118,13 +123,7 @@ logmech =
 
 ## Setup
 pip install the following packages into your python3.11 environment
-- python 3.11
-- crewai
-- crewai-tools
-- langchain-aws
-- teradataml
-- greate_expectations
-- yaml
+- python 3.11, crewai, crewai-tools, langchain-aws, teradataml, greate_expectations, yaml
 
 **On Linux/Mac:**
 ```
