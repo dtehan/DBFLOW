@@ -25,7 +25,7 @@ The entire flow of the process is controlled using crewai flow.
 - This requires a set of AWS keys to be defined in the geflow.env file.  Sonet 3.5 does a comprehensive job, but is slow and more expensive.
 
 **Bedrock Llama version**
-- This requires a set of AWS keys to be defined in the geflow.env file. Llama 3.2 3B model is fast and cheap, not a lot of details in the descriptions. 
+- This requires a set of AWS keys to be defined in the geflow.env file. Llama 3.2 3B or Llama 3.2 1B model is fast and cheap, not a lot of details in the descriptions. 
 
 **Azure OpenAI version**
 - This requires a set of Azure keys to be defined in the geflow.env file. GPT 4o mini is fast, comprehensive and reasonable price.
@@ -37,7 +37,7 @@ geflow.env file configuration shown below
 ##################################################
 # Application configuration
 ##################################################
-# Crew types supported are: Bedrock-Sonnet, Bedrock-Llama, Azure-GPT, OpenAI
+# Crew types supported are: Bedrock-Sonnet, Bedrock-Llama1b, Bedrock-Llama3b, Azure-GPT, OpenAI
 crew_type=Azure-GPT
 # Crew types can currently be "writer" - get table defintions OR "expectation" - gets a list of expectations
 crew=expectation
@@ -68,7 +68,8 @@ aws_role_arn=arn:aws:iam::300917836544:role/bedrock_sso
 aws_role_name=ben
 # Models supported, do not change
 aws_model_sonet=anthropic.claude-3-5-sonnet-20240620-v1:0
-aws_model_llama=us.meta.llama3-2-3b-instruct-v1:0
+aws_model_llama3b=us.meta.llama3-2-3b-instruct-v1:0
+aws_model_llama1b=us.meta.llama3-2-1b-instruct-v1:0
 
 ##################################################
 # Azure keys should be inserted below if using Azure AI
