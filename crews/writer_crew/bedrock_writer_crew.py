@@ -64,8 +64,10 @@ class BedrockWriterCrew():
         self.crew_type = os.getenv("crew_type")
         if self.crew_type == "Bedrock-Sonet":
             self.model_id = os.getenv("aws_model_sonet")
-        elif self.crew_type == "Bedrock-Llama":
-            self.model_id = os.getenv("aws_model_llama")
+        elif self.crew_type == "Bedrock-Llama1b":
+            self.model_id = os.getenv("aws_model_llama1b")
+        elif self.crew_type == "Bedrock-Llama3b":
+            self.model_id = os.getenv("aws_model_llama3b")
 
     def kickoff(self, inputs):
         # Building the system prompt and messages for the bedrock model
@@ -91,7 +93,7 @@ class BedrockWriterCrew():
                     "messages": messages
                 }
             )
-        elif self.crew_type == "Bedrock-Llama":
+        elif self.crew_type == "Bedrock-Llama1b" or self.crew_type == "Bedrock-Llama3b":
             formated_prompt = f"""
                 <|begin_of_text|><|start_header_id|>user<|end_header_id|>
                 {prompt_data}
@@ -110,5 +112,5 @@ class BedrockWriterCrew():
 
         if self.crew_type == "Bedrock-Sonnet":
             return response_body["content"][0]["text"]
-        elif self.crew_type == "Bedrock-Llama":
+        elif self.crew_type == "Bedrock-Llama1b" or self.crew_type == "Bedrock-Llama3b":
             return response_body["generation"]
