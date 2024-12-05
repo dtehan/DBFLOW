@@ -102,7 +102,7 @@ class ExpectationFlow(Flow[ExpectationState]):
     def routing_to_crew_type(self):
         return self.crew_type
 
-    @listen(or_("Bedrock-Sonet", "Bedrock-Llama3b", "Bedrock-Llama1b"))
+    @listen(or_("Bedrock-Sonnet", "Bedrock-Llama3b", "Bedrock-Llama1b", "Bedrock-Nova-Micro", "Bedrock-Nova-Lite"))
     def get_table_description_bedrock(self):
         print("#################################")
         print("Getting table description Bedrock")

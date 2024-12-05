@@ -27,6 +27,9 @@ The entire flow of the process is controlled using crewai flow.
 **Bedrock Llama version**
 - This requires a set of AWS keys to be defined in the geflow.env file. Llama 3.2 3B or Llama 3.2 1B model is fast and cheap, not a lot of details in the descriptions. 
 
+**Bedrock Nova version**
+- This requires a set of AWS keys to be defined in the geflow.env file. Nova Micro and Nova Lite model is fast and cheap. 
+
 **Azure OpenAI version**
 - This requires a set of Azure keys to be defined in the geflow.env file. GPT 4o mini is fast, comprehensive and reasonable price.
 
@@ -37,10 +40,10 @@ geflow.env file configuration shown below
 ##################################################
 # Application configuration
 ##################################################
-# Crew types supported are: Bedrock-Sonnet, Bedrock-Llama1b, Bedrock-Llama3b, Azure-GPT, OpenAI
-crew_type=Azure-GPT
+# Crew types supported are: Bedrock-Sonnet, Bedrock-Llama1b, Bedrock-Llama3b, Bedrock-Nova-Micro, Bedrock-Nova-Lite, Azure-GPT, OpenAI
+crew_type=Bedrock-Nova-Micro
 # Crew types can currently be "writer" - get table defintions OR "expectation" - gets a list of expectations
-crew=expectation
+crew=writer
 # DB ConfigFilePath should not be changed
 DBConfigFilePath=databases/dbconfig.ini
 
@@ -70,6 +73,8 @@ aws_role_name=ben
 aws_model_sonet=anthropic.claude-3-5-sonnet-20240620-v1:0
 aws_model_llama3b=us.meta.llama3-2-3b-instruct-v1:0
 aws_model_llama1b=us.meta.llama3-2-1b-instruct-v1:0
+aws_model_nova_micro=amazon.nova-micro-v1:0
+aws_model_nova_lite=amazon.nova-lite-v1:0
 
 ##################################################
 # Azure keys should be inserted below if using Azure AI

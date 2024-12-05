@@ -62,12 +62,6 @@ class BedrockExpectationCrew():
 
         # Get model infomation
         self.crew_type = os.getenv("crew_type")
-        if self.crew_type == "Bedrock-Sonet":
-            self.model_id = os.getenv("aws_model_sonet")
-        elif self.crew_type == "Bedrock-Llama1b":
-            self.model_id = os.getenv("aws_model_llama1b")
-        elif self.crew_type == "Bedrock-Llama3b":
-            self.model_id = os.getenv("aws_model_llama3b")
 
     def kickoff(self, inputs):
         # Building the system prompt and messages for the bedrock model
@@ -81,10 +75,12 @@ class BedrockExpectationCrew():
             self.tasks_config['write_expectation']['expected_output']
         for key, value in inputs.items():
             prompt_data = prompt_data.replace(key, value)
-        user_message = {"role": "user", "content": prompt_data}
-        messages = [user_message]
+
         # Building the body for the model invoke
         if self.crew_type == "Bedrock-Sonnet":
+            self.model_id = os.getenv("aws_model_sonnet")
+            user_message = {"role": "user", "content": prompt_data}
+            messages = [user_message]
             body = json.dumps(
                 {
                     "anthropic_version": "bedrock-2023-05-31",
@@ -93,7 +89,18 @@ class BedrockExpectationCrew():
                     "messages": messages
                 }
             )
+            response = self.bedrock_client.invoke_model(
+                body=body, modelId=self.model_id, contentType="application/json", accept="application/json"
+            )
+            response_body = json.loads(response.get('body').read())
+            return response_body["content"][0]["text"]
+
         elif self.crew_type == "Bedrock-Llama1b" or self.crew_type == "Bedrock-Llama3b":
+            if self.crew_type == "Bedrock-Llama1b":
+                self.model_id = os.getenv("aws_model_llama1b")
+            elif self.crew_type == "Bedrock-Llama3b":
+                self.model_id = os.getenv("aws_model_llama3b")
+
             formated_prompt = f"""
                 <|begin_of_text|><|start_header_id|>user<|end_header_id|>
                 {prompt_data}
@@ -105,12 +112,30 @@ class BedrockExpectationCrew():
                     "prompt": formated_prompt
                 }
             )
-
-        response = self.bedrock_client.invoke_model(
-            body=body, modelId=self.model_id, contentType="application/json", accept="application/json")
-        response_body = json.loads(response.get('body').read())
-
-        if self.crew_type == "Bedrock-Sonnet":
-            return response_body["content"][0]["text"]
-        elif self.crew_type == "Bedrock-Llama1b" or self.crew_type == "Bedrock-Llama3b":
+            response = self.bedrock_client.invoke_model(
+                body=body, modelId=self.model_id, contentType="application/json", accept="application/json"
+            )
+            response_body = json.loads(response.get('body').read())
             return response_body["generation"]
+
+        elif self.crew_type == "Bedrock-Nova-Micro" or self.crew_type == "Bedrock-Nova-Lite":
+            if self.crew_type == "Bedrock-Nova-Micro":
+                self.model_id = os.getenv("aws_model_nova_micro")
+            elif self.crew_type == "Bedrock-Nova-Lite":
+                self.model_id = os.getenv("aws_model_nova_lite")
+
+            message_list = [
+                {"role": "user", "content": [{"text": prompt_data}]}]
+            system_list = [{"text": system_prompt}]
+            additionalModelRequestFields = {
+                "inferenceConfig": {
+                    "topK": 20
+                }
+            }
+            response_body = self.bedrock_client.converse(
+                modelId="us.amazon.nova-lite-v1:0",
+                messages=message_list,
+                system=system_list,
+                additionalModelRequestFields=additionalModelRequestFields
+            )
+            return response_body["output"]["message"]["content"][0]["text"]
